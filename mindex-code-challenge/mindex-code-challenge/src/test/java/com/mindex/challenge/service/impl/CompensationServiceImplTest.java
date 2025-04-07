@@ -1,6 +1,8 @@
 package com.mindex.challenge.service.impl;
 
 import com.mindex.challenge.data.Compensation;
+import com.mindex.challenge.data.CompensationHistory;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +25,7 @@ public class CompensationServiceImplTest {
 
     private String compensationUrl;
     private String compensationIdUrl;
+    private String compensationHistoryIdUrl;
 
     @LocalServerPort
     private int port;
@@ -34,6 +37,7 @@ public class CompensationServiceImplTest {
     public void setup() {
         compensationUrl = "http://localhost:" + port + "/compensation";
         compensationIdUrl = "http://localhost:" + port + "/compensation/{id}";
+        compensationHistoryIdUrl = "http://localhost:" + port + "/compensation/{id}/history";
     }
 
     @Test
@@ -90,6 +94,55 @@ public class CompensationServiceImplTest {
         assertNotNull(newTestCompensation);
         assertCompensationEquivalence(testCompensation, newTestCompensation);
     }
+
+    @Test
+    public void testCompensationHistory() {
+        //create initial compensation for new employee (id = 123456789)
+        Compensation initialCompensation = new Compensation();
+        initialCompensation.setEmployeeId("123456789");
+        initialCompensation.setSalary(new BigDecimal("100000"));
+        initialCompensation.setEffectiveDate(LocalDate.of(2025, 1, 1));
+        initialCompensation.setPaidTimeOff(14);
+        initialCompensation.setBonusAmount(new BigDecimal("10000"));
+        initialCompensation.setStockOptions(100);
+
+        //add compensation to database
+        restTemplate.postForEntity(compensationUrl, initialCompensation, Compensation.class).getBody();
+
+        //update compensation
+        Compensation secondCompensation = restTemplate.getForEntity(compensationIdUrl, Compensation.class, "123456789").getBody();
+        secondCompensation.setSalary(new BigDecimal("200000"));
+        secondCompensation.setEffectiveDate(LocalDate.of(2026, 1, 1));
+
+        //add updated compensation to database (testing creation of new history List)
+        restTemplate.postForEntity(compensationUrl, secondCompensation, Compensation.class).getBody();
+
+        //update compensation again
+        Compensation latestCompensation = restTemplate.getForEntity(compensationIdUrl, Compensation.class, "123456789").getBody();
+        latestCompensation.setPaidTimeOff(21);
+        latestCompensation.setBonusAmount(new BigDecimal("15000"));
+        latestCompensation.setStockOptions(200);
+
+        //add latest compensation (testing adding to existing history List)
+        restTemplate.postForEntity(compensationUrl, latestCompensation, Compensation.class).getBody();
+
+        //read compensation history
+        CompensationHistory compensationHistory = restTemplate.getForEntity(compensationHistoryIdUrl, CompensationHistory.class, "123456789").getBody();
+
+        //run tests for history
+        assertNotNull(compensationHistory);
+        assertEquals("123456789", compensationHistory.getEmployeeId());
+        assertNotNull(compensationHistory.getHistory());
+        assertEquals(2, compensationHistory.getHistory().size());
+        assertCompensationEquivalence(initialCompensation, compensationHistory.getHistory().get(0));
+        assertCompensationEquivalence(secondCompensation, compensationHistory.getHistory().get(1));
+
+        //test that the latest compensation is stored in the Compensation database
+        Compensation currentCompensation = restTemplate.getForEntity(compensationIdUrl, Compensation.class, "123456789").getBody();
+        assertNotNull(currentCompensation);
+        assertCompensationEquivalence(latestCompensation, currentCompensation);
+    }
+
 
 
     private static void assertCompensationEquivalence(Compensation expected, Compensation actual) {

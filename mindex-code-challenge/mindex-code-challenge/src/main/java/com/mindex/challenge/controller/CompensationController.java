@@ -1,5 +1,6 @@
 package com.mindex.challenge.controller;
 import com.mindex.challenge.data.Compensation;
+import com.mindex.challenge.data.CompensationHistory;
 import com.mindex.challenge.service.CompensationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,5 +32,12 @@ public class CompensationController {
         LOG.debug("Received compensation read request for employee with id [{}]", id);
 
         return compensationService.read(id);
+    }
+
+    @GetMapping("/compensation/{id}/history")
+    public CompensationHistory readHistory(@PathVariable String id) {
+        LOG.debug("Received compensation history read request for employee with id [{}]", id);
+
+        return compensationService.readHistory(id);
     }
 }
