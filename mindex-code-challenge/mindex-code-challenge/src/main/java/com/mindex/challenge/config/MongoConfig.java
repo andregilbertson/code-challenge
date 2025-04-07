@@ -1,6 +1,5 @@
 package com.mindex.challenge.config;
 
-import com.mindex.challenge.dao.EmployeeRepository;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import de.bwaldvogel.mongo.MongoServer;
@@ -12,7 +11,7 @@ import org.springframework.lang.NonNull;
 
 import java.net.InetSocketAddress;
 
-@EnableMongoRepositories(basePackageClasses = EmployeeRepository.class)
+@EnableMongoRepositories(basePackages = "com.mindex.challenge.dao")
 @Configuration
 public class MongoConfig extends AbstractMongoClientConfiguration {
 
