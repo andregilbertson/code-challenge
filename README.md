@@ -16,7 +16,21 @@
 
 ---
 
-## 2. Bug Fixes
+## 2. How to Run
+**Prerequisites:**  
+- Java 17+  
+- Gradle  
+
+**Steps:**  
+```bash
+git clone [your-repo-url]
+cd employee-compensation-api
+./gradlew bootRun  # Starts app on http://localhost:8080
+```
+
+---
+
+## 3. Bug Fixes
 
 ### Existing
 
@@ -65,22 +79,27 @@
    
 ---
 
-## 3. Data Representation
+## 4. Data Representation
 
----
+### ER Diagram
 
-## 4. How to Run
-**Prerequisites:**  
-- Java 17+  
-- Gradle  
+![ER Diagram (2)](https://github.com/user-attachments/assets/58d992c9-357a-48b0-a8bc-5f1c2332dd17)
 
-**Steps:**  
-```bash
-git clone [your-repo-url]
-cd employee-compensation-api
-./gradlew bootRun  # Starts app on http://localhost:8080
-```
+### Relationships
+   1. **Employee-Compensation (1:1, optional)**:
+      - Each employee has **at most one** compensation. 
+      - Every compensation is linked to **one and only one** employee.
+   2. **Employee-Compensation History (1:1, optional)**:
+      - Each employee has **at most one** compensation history.
+      - Every compensation history is linked to **one and only one** employee.
+   3. **Compensation History-Archived Compensation (1:M, embedded)**:
+      - Each compensation history is embedded with **one or many** archived compensations.
+      - Every archived compensation belongs to **one and only one** compensation history.
 
+### Reasoning
+
+   
+   
 ---
 
 ## 5. API Endpoints
