@@ -2,8 +2,10 @@ package com.mindex.challenge.service.impl;
 
 import com.mindex.challenge.dao.CompensationHistoryRepository;
 import com.mindex.challenge.dao.CompensationRepository;
+import com.mindex.challenge.dao.EmployeeRepository;
 import com.mindex.challenge.data.Compensation;
 import com.mindex.challenge.data.CompensationHistory;
+import com.mindex.challenge.data.Employee;
 import com.mindex.challenge.service.CompensationService;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,9 @@ public class CompensationServiceImpl implements CompensationService {
     private static final Logger LOG = LoggerFactory.getLogger(CompensationServiceImpl.class);
 
     @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
     private CompensationRepository compensationRepository;
 
     @Autowired
@@ -28,6 +33,13 @@ public class CompensationServiceImpl implements CompensationService {
     @Override
     public Compensation create(Compensation compensation) {
         LOG.debug("Creating compensation [{}]", compensation);
+
+        //check if employee exists
+        Employee employee = employeeRepository.findByEmployeeId(compensation.getEmployeeId());
+        if (employee == null) {
+            throw new RuntimeException("Failed to create compensation for employee with id [" + compensation.getEmployeeId() + "]. Reason: Employee does not exist.");
+        }
+
 
         Compensation existingCompensation = compensationRepository.findByEmployeeId(compensation.getEmployeeId());
 
