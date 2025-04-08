@@ -23,9 +23,9 @@
 
 **Steps:**  
 ```bash
-git clone github.com/andregilbertson/code-challenge
-cd mindex-code-challenge
-./gradlew bootRun  # starts app on http://localhost:8080
+git clone https://github.com/andregilbertson/employee-data-api
+cd employee-data-api/mindex-code-challenge/mindex-code-challenge
+gradlew bootRun  # starts app on http://localhost:8080
 ```
    
 ---
